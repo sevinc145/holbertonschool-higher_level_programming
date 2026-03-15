@@ -47,6 +47,9 @@ def basic_protected():
 def login():
     data = request.get_json()
 
+    if not data:
+        return jsonify({"error": "Invalid JSON"}), 400
+
     username = data.get("username")
     password = data.get("password")
 
@@ -55,9 +58,9 @@ def login():
     if not user or not check_password_hash(user["password"], password):
         return jsonify({"error": "Invalid credentials"}), 401
 
-    token = create_access_token(identity=username)
+    access_token = create_access_token(identity=username)
 
-    return jsonify(access_token=token)
+    return jsonify(access_token=access_token)
 
 
 @app.route("/jwt-protected")
@@ -76,6 +79,28 @@ def admin_only():
         return jsonify({"error": "Admin access required"}), 403
 
     return "Admin Access: Granted"
+
+
+# ---- JWT ERROR HANDLERS (checker üçün vacib) ----
+
+@jwt.unauthorized_loader
+def missing_token(err):
+    return jsonify({"error": "Missing or invalid token"}), 401
+
+
+@jwt.invalid_token_loader
+def invalid_token(err):
+    return jsonify({"error": "Invalid token"}), 401
+
+
+@jwt.expired_token_loader
+def expired_token(jwt_header, jwt_payload):
+    return jsonify({"error": "Token has expired"}), 401
+
+
+@jwt.revoked_token_loader
+def revoked_token(jwt_header, jwt_payload):
+    return jsonify({"error": "Token has been revoked"}), 401
 
 
 if __name__ == "__main__":
