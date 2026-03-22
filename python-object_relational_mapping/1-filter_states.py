@@ -1,23 +1,43 @@
 #!/usr/bin/python3
+"""
+Lists all states with a name starting with N (upper N)
+from the database hbtn_0e_0_usa.
+"""
 import MySQLdb
 import sys
 
+
 if __name__ == "__main__":
+    # Terminal arqumentlərini dəyişənlərə mənimsədirik
+    db_user = sys.argv[1]
+    db_password = sys.argv[2]
+    db_name = sys.argv[3]
+
+    # Verilənlər bazasına bağlantı qurulur
     db = MySQLdb.connect(
         host="localhost",
         port=3306,
-        user=sys.argv[1],
-        passwd=sys.argv[2],
-        db=sys.argv[3]
+        user=db_user,
+        passwd=db_password,
+        db=db_name
     )
 
-    cur = db.cursor()
-    cur.execute("SELECT * FROM states WHERE name LIKE BINARY 'N%' ORDER BY states.id ASC")
+    # Sorğuları icra etmək üçün cursor obyekti yaradılır
+    cursor = db.cursor()
 
-    rows = cur.fetchall()
+    # SQL sorğusu: 'N' ilə başlayanları seçirik (id üzrə artan sıra ilə)
+    # Burada 'BINARY' açar sözü 'N' hərfinin böyük olmasına zəmanət verir
+    cursor.execute("SELECT * FROM states "
+                   "WHERE name LIKE BINARY 'N%' "
+                   "ORDER BY id ASC")
 
-    for row in rows:
+    # Bütün nəticələri əldə edirik
+    query_rows = cursor.fetchall()
+
+    # Hər bir sətiri çap edirik
+    for row in query_rows:
         print(row)
 
-    cur.close()
+    # Bağlantıları təmiz şəkildə qapadırıq
+    cursor.close()
     db.close()
