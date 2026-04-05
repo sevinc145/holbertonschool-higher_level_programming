@@ -1,4 +1,1 @@
-chmod u+x 20-answer.txt
-git add 20-answer.txt
-git commit -m "task"
-git push
+Yes
