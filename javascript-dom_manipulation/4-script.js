@@ -6,3 +6,4 @@ addItem.addEventListener('click', function() {
   newItem.textContent = 'Item';
   myList.appendChild(newItem);
 });
+
